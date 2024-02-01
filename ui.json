@@ -85,7 +85,10 @@
                 "cssClasses": ""
             },
             "parentId": "hz6rv0706zkkpjgv",
-            "position": 0
+            "position": 0,
+            "handlers": {
+                "plotly-click": "click"
+            }
         },
         "vbd42u4ohz5rrj9f": {
             "id": "vbd42u4ohz5rrj9f",
@@ -165,7 +168,7 @@
                 "text": "Reset"
             },
             "parentId": "ls2ps45h05o896o7",
-            "position": 0,
+            "position": 1,
             "handlers": {
                 "ss-click": "reset"
             },
@@ -174,12 +177,25 @@
         "ls2ps45h05o896o7": {
             "id": "ls2ps45h05o896o7",
             "type": "horizontalstack",
-            "content": {
-                "contentHAlign": "start"
-            },
+            "content": {},
             "parentId": "n74w1nh26itdgkix",
             "position": 3,
             "handlers": {},
+            "visible": true
+        },
+        "pa1wxgrkgdlucstw": {
+            "id": "pa1wxgrkgdlucstw",
+            "type": "checkboxinput",
+            "content": {
+                "label": "Display options",
+                "options": "{\n  \"contours\": \"Show contours\",\n  \"heatmap\": \"Show heatmap\"\n}",
+                "orientation": "horizontal"
+            },
+            "parentId": "ls2ps45h05o896o7",
+            "position": 0,
+            "handlers": {
+                "ss-options-change": "options_changed"
+            },
             "visible": true
         }
     }
