@@ -11,6 +11,7 @@ def get(state, *key): return (state[k] for k in key)
 
 def plot_line(state):
     w0, w1, theta = get(state, 'w0', 'w1', 'theta')
+    Lx0, Lx1, Lw0, Lw1, Ltt = get(state['label'], 'x0', 'x1', 'w0', 'w1', 'tt')
     Z = w0 * X + w1 * Y    
     
     if 'contours' in state['options']:    
@@ -22,10 +23,10 @@ def plot_line(state):
         colorscale = [(0,'#0000ff'), (0.5,'#9999ff'), (0.5,'#ff9999'),(1.0,'#ff0000')]
     else:
         colorscale = [(0.0, '#ffffff'), (1.0, '#ffffff')]
-    templ = (f'w0 &times; x0 + w1 &times; x1'
+    templ = (f'{Lx0} {Lx0} + {Lw1} {Lx1}'
              f'<br>  = {w0:.2f}' + " &times; %{x:.1f} + " f'{w1:.2f}' " &times; %{y:.1f}"
               "<br>  = %{z:.3f}<extra></extra>")
-    zabs = 2 # max(abs(theta - np.min(Z)), (np.max(Z) - theta))/4
+    zabs = 2
     contour = go.Contour(
         x=x, y=y, z=Z, 
         colorscale=colorscale, zmin=theta-zabs, zmax=theta+zabs,
@@ -33,29 +34,34 @@ def plot_line(state):
         opacity=0.6, showscale=False, hovertemplate=templ,
     )
     data = [contour]
+
+    font=dict(size=24, color='#0000FF', family='Arial, sans-serif')
+    axislo = dict(range=[-1.1, 2.1], fixedrange=True, constrain="domain", dtick=1, tick0=0,
+            zeroline=True, zerolinewidth=2, zerolinecolor='#AAAAFF',
+            title_font=font)
     layout = go.Layout(
-        title=f'{w0:.3f} x0 + {w1:.3f} x1 >= {theta}',
-        width=700,height=700,
-        xaxis=dict(title='x0', range=[-1.1, 2.1], fixedrange=True,
-          constrain="domain", scaleanchor="y", scaleratio=1,
-          dtick=1,tick0=0),
-        yaxis=dict(title='x1', range=[-1.1, 2.1], fixedrange=True,
-          constrain="domain", dtick=1,tick0=0),
-        paper_bgcolor='#EEEEEE',
-        margin=dict(l=30, r=30, t=30, b=30),
+        title=f'{w0:.3f} {Lx0} + {w1:.3f} {Lx1} = {theta}', title_font=font,
+        width=700, height=700, paper_bgcolor='#EEEEEE',
+        xaxis=dict(title=Lx0, **axislo, scaleanchor="y", scaleratio=1),
+        yaxis=dict(title=Lx1, **axislo),
+        margin=dict(l=30, r=30, t=50, b=30),
     )
     fig = go.Figure(data=data, layout=layout)
 
-    truth = state['truth']
-    for i in [0,1]:
-        for j in [0,1]:
-            add_circle(fig, i, j, truth[i,j], state)
+    if 'ttab' in state['options']:
+        truth = state['truth']
+        for i in [0,1]:
+            for j in [0,1]:
+                add_circle(fig, i, j, truth[i,j], state)
+    
     state['graph'] = fig
 
 def add_circle(fig, x, y, truth, state):
     w0, w1 = get(state, 'w0', 'w1')
+    Lx0, Lx1, Lw0, Lw1 = get(state['label'], 'x0', 'x1', 'w0', 'w1')
+
     value = w0 * x + w1 * y
-    templ = (f'w0 &times; x0 + w1 &times; x1'
+    templ = (f'{Lw0} {Lx0} + {Lw1} {Lx1}'
             f'<br>  = {w0:.2f}' + " &times; %{x:.1f} + " f'{w1:.2f}' " &times; %{y:.1f}"
             f"<br>  = {value:.3f}<extra></extra>")
     # Determine color based on truth
@@ -90,16 +96,23 @@ def click(state, payload):
 
 def options_changed(state, payload):
     state['options'] = payload
+    state['label'] = labelw0w1 if 'usew0w1' in payload else labelabxy
     plot_line(state)
 
+
+labelw0w1 = dict(w0='w0', w1='w1', x0='x0', x1='x1', tt='θ',
+                 title="w0⋅x0 + w1⋅x1 > θ")
+labelabxy = dict(w0='a', w1='b', x0='x', x1='y', tt='z',
+                 title="a⋅x + b⋅y > z")
 initial_state = ss.init_state({
-    "title": "w0w1theta Demo",
+    "title": labelabxy['title'],
     "w0": 1,
     "w1": 1,
     "theta": 1,
     "truth": np.zeros(shape=(2,2), dtype='int32'),
     "graph" : None,
     "options": [],
+    "label": dict(labelabxy),
 })
 
 plot_line(initial_state)
