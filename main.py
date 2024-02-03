@@ -56,6 +56,14 @@ def plot_line(state):
     
     state['graph'] = fig
 
+    def inv(v): return 'inf' if np.isclose(v,0) else f'{theta/v:.3f}'
+    msg = f'''
+    NOTES
+    - {Lx0}-axis intercept = {Ltt}/{Lw0} = {inv(w0)}
+    - {Lx1}-axis intercept = {Ltt}/{Lw1} = {inv(w1)}
+    '''
+    state['msg'] = msg
+
 def add_circle(fig, x, y, truth, state):
     w0, w1 = get(state, 'w0', 'w1')
     Lx0, Lx1, Lw0, Lw1 = get(state['label'], 'x0', 'x1', 'w0', 'w1')
@@ -113,6 +121,7 @@ initial_state = ss.init_state({
     "graph" : None,
     "options": [],
     "label": dict(labelabxy),
+    "msg": '',
 })
 
 plot_line(initial_state)
