@@ -95,10 +95,10 @@
             "id": "vbd42u4ohz5rrj9f",
             "type": "sliderinput",
             "content": {
-                "label": "@{label.w0}",
+                "label": "@{label.a}",
                 "minValue": "-2",
                 "maxValue": "2",
-                "stepSize": "0.01"
+                "stepSize": "0.1"
             },
             "parentId": "n74w1nh26itdgkix",
             "position": 0,
@@ -107,7 +107,7 @@
             },
             "binding": {
                 "eventType": "ss-number-change",
-                "stateRef": "w0"
+                "stateRef": "abz.a"
             },
             "visible": true
         },
@@ -115,10 +115,10 @@
             "id": "lxdj8zthsefibmj4",
             "type": "sliderinput",
             "content": {
-                "label": "@{label.w1}",
+                "label": "@{label.b}",
                 "minValue": "-2",
                 "maxValue": "2",
-                "stepSize": "0.01"
+                "stepSize": "0.1"
             },
             "parentId": "n74w1nh26itdgkix",
             "position": 1,
@@ -127,17 +127,17 @@
             },
             "binding": {
                 "eventType": "ss-number-change",
-                "stateRef": "w1"
+                "stateRef": "abz.b"
             }
         },
         "z71xuufmduddblj3": {
             "id": "z71xuufmduddblj3",
             "type": "sliderinput",
             "content": {
-                "label": "@{label.tt}",
+                "label": "@{label.z}",
                 "minValue": "-2",
                 "maxValue": "2",
-                "stepSize": "0.01"
+                "stepSize": "0.1"
             },
             "parentId": "n74w1nh26itdgkix",
             "position": 2,
@@ -146,7 +146,7 @@
             },
             "binding": {
                 "eventType": "ss-number-change",
-                "stateRef": "theta"
+                "stateRef": "abz.z"
             },
             "visible": true
         },
@@ -168,8 +168,8 @@
             "content": {
                 "text": "Reset"
             },
-            "parentId": "dvl534xx01rwgoez",
-            "position": 0,
+            "parentId": "1l9bm5mbvdzu5ozs",
+            "position": 1,
             "handlers": {
                 "ss-click": "reset"
             },
@@ -189,7 +189,7 @@
             "type": "checkboxinput",
             "content": {
                 "label": "Display options",
-                "options": "{\n  \"usew0w1\": \"Name x,y,z as w0,w1,\u03b8\",\n  \"contours\": \"Show contours\",\n  \"heatmap\": \"Show heatmap\",\n  \"ttab\": \"Show truth table\"\n}",
+                "options": "{\n  \"usewwt\": \"Name x,y,z as w0,w1,\u03b8\",\n  \"contours\": \"Show contours\",\n  \"heatmap\": \"Show heatmap\",\n  \"ttab\": \"Show truth table\"\n}",
                 "orientation": "vertical"
             },
             "parentId": "xrbtvlblo2upn71t",
@@ -240,6 +240,28 @@
             },
             "parentId": "n74w1nh26itdgkix",
             "position": 4,
+            "handlers": {},
+            "visible": true
+        },
+        "r1odci0i6bzyssgc": {
+            "id": "r1odci0i6bzyssgc",
+            "type": "button",
+            "content": {
+                "text": "-1x"
+            },
+            "parentId": "1l9bm5mbvdzu5ozs",
+            "position": 0,
+            "handlers": {
+                "ss-click": "minus1"
+            },
+            "visible": true
+        },
+        "1l9bm5mbvdzu5ozs": {
+            "id": "1l9bm5mbvdzu5ozs",
+            "type": "horizontalstack",
+            "content": {},
+            "parentId": "dvl534xx01rwgoez",
+            "position": 0,
             "handlers": {},
             "visible": true
         }

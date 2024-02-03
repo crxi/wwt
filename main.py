@@ -7,43 +7,43 @@ x = np.linspace(-3, 4, 141)
 y = np.linspace(-3, 4, 141)
 X, Y = np.meshgrid(x, y)
 
-def get(state, *key): return (state[k] for k in key)
+def _get(state, *key): return (state[k] for k in key)
 
 def plot_line(state):
-    w0, w1, theta = get(state, 'w0', 'w1', 'theta')
-    Lx0, Lx1, Lw0, Lw1, Ltt = get(state['label'], 'x0', 'x1', 'w0', 'w1', 'tt')
-    Z = w0 * X + w1 * Y    
+    a, b, z = _get(state['abz'], 'a', 'b', 'z')
+    La, Lb, Lx, Ly, Lz = _get(state['label'], 'a', 'b', 'x', 'y', 'z')
+    Z = a * X + b * Y    
     
     if 'contours' in state['options']:    
         labels = dict(start=-10, end=10, size=0.5, showlabels = True,
                       labelfont = dict(size = 14, color = 'black'))
     else:
-        labels = dict(start=theta, end=theta, size=0.5)
+        labels = dict(start=z, end=z, size=0.5)
     if 'heatmap' in state['options']:
         colorscale = [(0,'#0000ff'), (0.5,'#9999ff'), (0.5,'#ff9999'),(1.0,'#ff0000')]
     else:
         colorscale = [(0.0, '#ffffff'), (1.0, '#ffffff')]
-    templ = (f'{Lw0} {Lx0} + {Lw1} {Lx1}'
-             f'<br>  = {w0:.2f}' + " &times; %{x:.1f} + " f'{w1:.2f}' " &times; %{y:.1f}"
-              "<br>  = %{z:.3f}<extra></extra>")
+    templ = (f'{La} {Lx} + {Lb} {Ly}'
+             f'<br>  = {a:.2f}' + ' &times; %{x:.1f} + ' f'{b:.2f}' ' &times; %{y:.1f}'
+              '<br>  = %{z:.3f}<extra></extra>')
     zabs = 2
     contour = go.Contour(
         x=x, y=y, z=Z, 
-        colorscale=colorscale, zmin=theta-zabs, zmax=theta+zabs,
+        colorscale=colorscale, zmin=z-zabs, zmax=z+zabs,
         contours=dict(coloring='heatmap', **labels),
         opacity=0.6, showscale=False, hovertemplate=templ,
     )
     data = [contour]
 
     font=dict(size=24, color='#0000FF', family='Arial, sans-serif')
-    axislo = dict(range=[-1.1, 2.1], fixedrange=True, constrain="domain", dtick=1, tick0=0,
+    axislo = dict(range=[-1.1, 2.1], fixedrange=True, constrain='domain', dtick=1, tick0=0,
             zeroline=True, zerolinewidth=2, zerolinecolor='#AAAAFF',
             title_font=font)
     layout = go.Layout(
-        title=f'{w0:.3f} {Lx0} + {w1:.3f} {Lx1} = {theta}', title_font=font,
+        title=f'{a:.3f} {Lx} + {b:.3f} {Ly} = {z}', title_font=font,
         width=700, height=700, paper_bgcolor='#EEEEEE',
-        xaxis=dict(title=Lx0, **axislo, scaleanchor="y", scaleratio=1),
-        yaxis=dict(title=Lx1, **axislo),
+        xaxis=dict(title=Lx, **axislo, scaleanchor='y', scaleratio=1),
+        yaxis=dict(title=Ly, **axislo),
         margin=dict(l=30, r=30, t=50, b=30),
     )
     fig = go.Figure(data=data, layout=layout)
@@ -52,26 +52,26 @@ def plot_line(state):
         truth = state['truth']
         for i in [0,1]:
             for j in [0,1]:
-                add_circle(fig, i, j, truth[i,j], state)
+                _add_truth_table(fig, i, j, truth[i,j], state)
     
     state['graph'] = fig
 
-    def inv(v): return 'inf' if np.isclose(v,0) else f'{theta/v:.3f}'
+    def inv(v): return 'inf' if np.isclose(v,0) else f'{z/v:.3f}'
     msg = f'''
     NOTES
-    - {Lx0}-axis intercept = {Ltt}/{Lw0} = {inv(w0)}
-    - {Lx1}-axis intercept = {Ltt}/{Lw1} = {inv(w1)}
+    - {Lx}-axis intercept = {Lz}/{La} = {inv(a)}
+    - {Ly}-axis intercept = {Lz}/{Lb} = {inv(b)}
     '''
     state['msg'] = msg
 
-def add_circle(fig, x, y, truth, state):
-    w0, w1 = get(state, 'w0', 'w1')
-    Lx0, Lx1, Lw0, Lw1 = get(state['label'], 'x0', 'x1', 'w0', 'w1')
+def _add_truth_table(fig, x, y, truth, state):
+    a, b = _get(state['abz'], 'a', 'b')
+    La, Lb, Lx, Ly = _get(state['label'], 'a', 'b', 'x', 'y')
 
-    value = w0 * x + w1 * y
-    templ = (f'{Lw0} {Lx0} + {Lw1} {Lx1}'
-            f'<br>  = {w0:.2f}' + " &times; %{x:.1f} + " f'{w1:.2f}' " &times; %{y:.1f}"
-            f"<br>  = {value:.3f}<extra></extra>")
+    value = a * x + b * y
+    templ = (f'{La} {Lx} + {Lb} {Ly}'
+            f'<br>  = {a:.2f}' + ' &times; %{x:.1f} + ' f'{b:.2f}' ' &times; %{y:.1f}'
+            f'<br>  = {value:.3f}<extra></extra>')
     # Determine color based on truth
     circle_color = 'black' if truth == 0 else 'red'
     text_color = 'pink' if truth == 0 else 'white'
@@ -88,10 +88,15 @@ def add_circle(fig, x, y, truth, state):
     
 
 def reset(state):
-    state['w0'] = 1
-    state['w1'] = 1
-    state['theta'] = 1
+    state['abz'] = defabz
     state['truth'] = np.zeros(shape=(2,2), dtype='int32')
+    plot_line(state)
+
+def minus1(state):
+    s = state['abz']
+    s['a'] *= -1
+    s['b'] *= -1
+    s['z'] *= -1
     plot_line(state)
 
 def click(state, payload):
@@ -104,24 +109,24 @@ def click(state, payload):
 
 def options_changed(state, payload):
     state['options'] = payload
-    state['label'] = labelw0w1 if 'usew0w1' in payload else labelabxy
+    state['label'] = labelwwt if 'usewwt' in payload else labelabz
     plot_line(state)
 
 
-labelw0w1 = dict(w0='w0', w1='w1', x0='x0', x1='x1', tt='θ',
-                 title="w0⋅x0 + w1⋅x1 > θ")
-labelabxy = dict(w0='a', w1='b', x0='x', x1='y', tt='z',
-                 title="a⋅x + b⋅y > z")
+labelwwt = dict(a='w0', b='w1', x='x0', y='x1', z='θ',
+                title='w0⋅x0 + w1⋅x1 = θ')
+labelabz = dict(a='a', b='b', x='x', y='y', z='z',
+                title='a⋅x + b⋅y = z')
+deflabel = labelabz
+defabz = dict(a=-1,b=1,z=0)
+
 initial_state = ss.init_state({
-    "title": labelabxy['title'],
-    "w0": 1,
-    "w1": 1,
-    "theta": 1,
-    "truth": np.zeros(shape=(2,2), dtype='int32'),
-    "graph" : None,
-    "options": [],
-    "label": dict(labelabxy),
-    "msg": '',
+    'label': deflabel,
+    'abz': defabz,
+    'truth': np.zeros(shape=(2,2), dtype='int32'),
+    'graph' : None,
+    'options': [],
+    'msg': '',
 })
 
 plot_line(initial_state)
