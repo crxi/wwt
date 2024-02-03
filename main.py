@@ -23,7 +23,7 @@ def plot_line(state):
         colorscale = [(0,'#0000ff'), (0.5,'#9999ff'), (0.5,'#ff9999'),(1.0,'#ff0000')]
     else:
         colorscale = [(0.0, '#ffffff'), (1.0, '#ffffff')]
-    templ = (f'{Lx0} {Lx0} + {Lw1} {Lx1}'
+    templ = (f'{Lw0} {Lx0} + {Lw1} {Lx1}'
              f'<br>  = {w0:.2f}' + " &times; %{x:.1f} + " f'{w1:.2f}' " &times; %{y:.1f}"
               "<br>  = %{z:.3f}<extra></extra>")
     zabs = 2
